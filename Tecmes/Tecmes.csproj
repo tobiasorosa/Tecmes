@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibSassHost" Version="1.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
@@ -23,6 +24,7 @@
   <ItemGroup>
     <Folder Include="Infrastructure\Auth\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\dist\" />
   </ItemGroup>
 
 </Project>

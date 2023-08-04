@@ -25,9 +25,11 @@ namespace Tecmes.Application.Services.Auth
             if (user == null)
                 return Result<string>.Failure("Não foi encontrado usuário com esse acesso");
 
-            // Generate JWT token
+            var jwtSecretKeyString = _configuration["Jwt:Secret"];
+            var jwtSecretKey = Convert.FromBase64String(jwtSecretKeyString);
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
+            var key = new SymmetricSecurityKey(jwtSecretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -35,7 +37,7 @@ namespace Tecmes.Application.Services.Auth
                 new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(jwtSecretKey), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);

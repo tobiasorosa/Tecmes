@@ -8,6 +8,8 @@ using Tecmes.Application.Services.Auth;
 using Scrutor;
 using System.Security.Cryptography;
 using Tecmes.Application.Repositories.Users;
+using LibSassHost;
+using Tecmes.Infrastructure.Middlewares;
 
 namespace Tecmes
 {
@@ -27,12 +29,14 @@ namespace Tecmes
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tecmes API", Version = "v1" });
             });
 
-            // Add Entity Framework DbContext
             services.AddDbContext<TecmesDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             byte[] jwtSecretKey = GenerateJwtKey(32);
             var key = new SymmetricSecurityKey(jwtSecretKey);
+            var tokenString = Convert.ToBase64String(jwtSecretKey);
+
+            Configuration["Jwt:Secret"] = tokenString;
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -57,11 +61,14 @@ namespace Tecmes
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseStaticFiles();
+                app.UseMiddleware<SassMiddleware>();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
+                app.UseStaticFiles();
             }
 
             app.UseHttpsRedirection();
@@ -69,14 +76,14 @@ namespace Tecmes
 
             app.UseRouting();
 
-            app.UseAuthentication(); // If you have implemented JWT authentication
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API Name V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tecmes API V1");
             });
 
             app.UseEndpoints(endpoints =>

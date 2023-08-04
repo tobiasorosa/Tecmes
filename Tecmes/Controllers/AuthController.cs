@@ -29,7 +29,7 @@ namespace Tecmes.Controllers
             // If authentication is successful, generate a JWT token and return it to the client
             var result = _authService.GenerateJwtToken(model.Username, passwordMd5.Value);
 
-            return Ok(new { Token = result });
+            return Ok(result);
         }
 
         [HttpPost("register")]
