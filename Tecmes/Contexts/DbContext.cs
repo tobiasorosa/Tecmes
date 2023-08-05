@@ -124,10 +124,10 @@ namespace Tecmes.Contexts
                 builder.Property(p => p.QuantitySold)
                     .HasDefaultValue(0);
 
-                builder.HasOne<ProductionOrder>()
+                builder.HasOne<Product>()
                     .WithMany()
                     .HasForeignKey(p => p.ProductId)
-                    .HasConstraintName("FkSaleOrderTbXProductTb");
+                    .HasConstraintName("FkProductionOrderTbXProductTb");
             });
         }
         
