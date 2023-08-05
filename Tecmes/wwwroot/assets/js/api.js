@@ -1,5 +1,7 @@
-﻿// Function to get the JWT token from localStorage
-function getJwtToken() {
+﻿import axios from 'axios';
+
+// Function to get the JWT token from localStorage
+export function getJwtToken() {
   return localStorage.getItem('jwtToken');
 }
 

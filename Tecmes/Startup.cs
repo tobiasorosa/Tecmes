@@ -10,6 +10,8 @@ using System.Security.Cryptography;
 using Tecmes.Application.Repositories.Users;
 using LibSassHost;
 using Tecmes.Infrastructure.Middlewares;
+using Tecmes.Application.Repositories.Production;
+using Tecmes.Application.Services.Production;
 
 namespace Tecmes
 {
@@ -54,6 +56,8 @@ namespace Tecmes
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IProductionRepository,  ProductionRepository>();
+            services.AddScoped<IProductionService, ProductionService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

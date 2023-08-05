@@ -13,17 +13,17 @@ namespace Tecmes.Entities
         {
             Id = id;
         }
-        public ProductionOrder(int id, int quantity, int productId, bool isCompleted = false, int quantitySold = 0) : this(id)
+        public ProductionOrder(int id, int quantity, Product product, bool isCompleted = false, int quantitySold = 0) : this(id)
         {
             Quantity = quantity;
-            ProductId = productId;
+            ProductId = product.Id;
             IsCompleted = isCompleted;
             QuantitySold = quantitySold;
         }
-        public ProductionOrder( int quantity, int productId, bool isCompleted = false, int quantitySold = 0)
+        public ProductionOrder( int quantity, Product product, bool isCompleted = false, int quantitySold = 0)
         {
             Quantity = quantity;
-            ProductId = productId;
+            ProductId = product.Id;
             IsCompleted = isCompleted;
             QuantitySold = quantitySold;
         }

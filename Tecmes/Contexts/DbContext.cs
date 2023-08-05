@@ -1,7 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata.Conventions;
+using System.Linq;
 using Tecmes.Entities;
 using Tecmes.Extensions;
-using Tecmes.Models.Auth;
+using Tecmes.Infrastructure;
 
 namespace Tecmes.Contexts
 {
@@ -24,6 +30,10 @@ namespace Tecmes.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            ConfigureConventions(modelBuilder);
+
             modelBuilder.Entity<User>(builder =>
             {
                 builder.ToTable($"{nameof(User)}Tb".ToSnakeCase());
@@ -120,5 +130,54 @@ namespace Tecmes.Contexts
                     .HasConstraintName("FkSaleOrderTbXProductTb");
             });
         }
+        
+
+        protected static Action<ModelBuilder> ConfigureConventions => modelBuilder =>
+        {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                if (string.IsNullOrEmpty(entity.GetViewName()))
+                {
+                    entity.SetTableName(entity.GetTableName().ToSnakeCase());
+                }
+
+                // Replace column names            
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToSnakeCase());
+                }
+
+                foreach (var key in entity.GetKeys())
+                {
+                    key.SetName(key.GetName().ToSnakeCase());
+                }
+
+                foreach (var key in entity.GetForeignKeys())
+                {
+                    key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
+                }
+
+                foreach (var key in entity.GetIndexes())
+                {
+                    key.SetDatabaseName(key.GetDatabaseName().ToSnakeCase());
+                }
+
+                foreach (var index in entity.GetProperties().Where(p => (p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)) &&
+                                                                        string.IsNullOrEmpty(p.GetColumnType())))
+                {
+                    index.SetColumnType("numeric(18,2)");
+                }
+
+                foreach (var key in entity.GetForeignKeys())
+                {
+                    key.DeleteBehavior = DeleteBehavior.Restrict;
+                }
+            }
+
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes().Where(e => e.IsOwned()).SelectMany(e => e.GetForeignKeys()))
+            {
+                relationship.DeleteBehavior = DeleteBehavior.Cascade;
+            }
+        };
     }
 }
